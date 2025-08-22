@@ -1,7 +1,8 @@
-package com.aust.employeemanager.security;
+package com.aust.employeemanager.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -45,17 +46,25 @@ public class SecurityConfig {
     // Define authorization rules
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for simplicity (good for APIs)
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())  // enable CORS
                 .authorizeHttpRequests(auth -> auth
+                        // allow preflight requests for all origins
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
                         // USER and ADMIN can view
                         .requestMatchers("/employee/all", "/employee/find/**").hasAnyRole("USER", "ADMIN")
+
                         // Only ADMIN can add, update, delete
                         .requestMatchers("/employee/add", "/employee/update", "/employee/delete/**").hasRole("ADMIN")
-                        // Everything else requires authentication
+
+                        // everything else requires authentication
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults()).build(); // Enable basic authentication (username/password prompt)
+                .httpBasic(Customizer.withDefaults());
+
+        return http.build();
     }
 
     @Bean
@@ -70,4 +79,5 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }
