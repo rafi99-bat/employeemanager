@@ -3,12 +3,16 @@ package com.aust.employeemanager.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -19,15 +23,20 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     // Define in-memory users
     @Bean
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
 
         // A normal user (can only view)
         manager.createUser(
                 User.withUsername("user")
-                        .password("{noop}user123")   // {noop} means no encoding, plain text
+                        .password(passwordEncoder.encode("user123"))
                         .roles("USER")
                         .build()
         );
@@ -35,7 +44,7 @@ public class SecurityConfig {
         // An admin user (can CRUD employees)
         manager.createUser(
                 User.withUsername("admin")
-                        .password("{noop}admin123")
+                        .password(passwordEncoder.encode("admin123"))
                         .roles("ADMIN")
                         .build()
         );
@@ -46,7 +55,7 @@ public class SecurityConfig {
     // Define authorization rules
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())  // enable CORS
                 .authorizeHttpRequests(auth -> auth
@@ -62,9 +71,7 @@ public class SecurityConfig {
                         // everything else requires authentication
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults());
-
-        return http.build();
+                .httpBasic(Customizer.withDefaults()).build();
     }
 
     @Bean
