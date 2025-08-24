@@ -1,13 +1,18 @@
 package com.aust.employeemanager.config;
 
+import com.aust.employeemanager.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -23,34 +28,56 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
+    private final CustomUserDetailsService userDetailsService;
+
+    public SecurityConfig(CustomUserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // Define in-memory users
+//    // Define in-memory users
+//    @Bean
+//    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
+//        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+//
+//        // A normal user (can only view)
+//        manager.createUser(
+//                User.withUsername("user")
+//                        .password(passwordEncoder.encode("user123"))
+//                        .roles("USER")
+//                        .build()
+//        );
+//
+//        // An admin user (can CRUD employees)
+//        manager.createUser(
+//                User.withUsername("admin")
+//                        .password(passwordEncoder.encode("admin123"))
+//                        .roles("ADMIN")
+//                        .build()
+//        );
+//
+//        return manager;
+//    }
+
+    // Authentication provider using DB
     @Bean
-    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-
-        // A normal user (can only view)
-        manager.createUser(
-                User.withUsername("user")
-                        .password(passwordEncoder.encode("user123"))
-                        .roles("USER")
-                        .build()
-        );
-
-        // An admin user (can CRUD employees)
-        manager.createUser(
-                User.withUsername("admin")
-                        .password(passwordEncoder.encode("admin123"))
-                        .roles("ADMIN")
-                        .build()
-        );
-
-        return manager;
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
     }
+
+    // Expose AuthenticationManager
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
 
     // Define authorization rules
     @Bean
@@ -61,6 +88,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // allow preflight requests for all origins
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // Registration should be allowed without login
+                        .requestMatchers("/users/create").permitAll()
 
                         // USER and ADMIN can view
                         .requestMatchers("/employee/all", "/employee/find/**").hasAnyRole("USER", "ADMIN")
