@@ -20,10 +20,6 @@ public class UserService {
         AppUser existingUser = userRepository.findByUsername(username);
 
         if (existingUser != null) {
-            // Update password if user already exists
-            //existingUser.setPassword(passwordEncoder.encode(rawPassword));
-            //userRepository.save(existingUser);
-            //System.out.println("Updated password for user: " + username);
             System.out.println("Username already exists: " + username);
         } else {
             // Create new user

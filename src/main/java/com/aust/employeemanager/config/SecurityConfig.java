@@ -1,5 +1,6 @@
 package com.aust.employeemanager.config;
 
+import com.aust.employeemanager.security.JwtAuthFilter;
 import com.aust.employeemanager.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,7 +79,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-
+    /*
     // Define authorization rules
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -102,6 +103,21 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults()).build();
+    }*/
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
+        return http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/users/create", "/auth/login").permitAll()
+                        .requestMatchers("/employee/all", "/employee/find/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers("/employee/add", "/employee/update", "/employee/delete/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtAuthFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean

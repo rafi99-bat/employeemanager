@@ -20,7 +20,7 @@ public class UserResource {
             @RequestParam String role) {
         try {
             userService.createUser(username, password, role);
-            return ResponseEntity.ok("User registered/updated successfully!");
+            return ResponseEntity.ok("User registered successfully!");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error: " + e.getMessage());

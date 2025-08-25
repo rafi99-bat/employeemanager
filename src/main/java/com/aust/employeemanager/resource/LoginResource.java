@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 @RestController
 public class LoginResource {
 
-    @GetMapping("/auth/login")
+    /*@GetMapping("/auth/login")
     public ResponseEntity<?> login(@RequestParam String role, Authentication auth) {
         if (auth == null) {
             return ResponseEntity.status(401).body("Authentication failed");
@@ -26,5 +26,5 @@ public class LoginResource {
         } else {
             return ResponseEntity.status(403).body("Role mismatch");
         }
-    }
+    }*/
 }
