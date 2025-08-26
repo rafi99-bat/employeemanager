@@ -1,6 +1,6 @@
 package com.aust.employeemanager.service;
 
-import com.aust.employeemanager.model.AppUser;
+import com.aust.employeemanager.entity.AppUser;
 import com.aust.employeemanager.repo.UserRepo;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,19 +16,22 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public void createUser(String username, String rawPassword, String role) {
+    public int createUser(String username, String rawPassword) {
+        if (username.equals("admin")) {
+            return 1;
+        }
         AppUser existingUser = userRepository.findByUsername(username);
 
         if (existingUser != null) {
-            System.out.println("Username already exists: " + username);
+            return 2;
         } else {
             // Create new user
             AppUser newUser = new AppUser();
             newUser.setUsername(username);
             newUser.setPassword(passwordEncoder.encode(rawPassword));
-            newUser.setRole(role);
+            newUser.setRole("ROLE_USER");
             userRepository.save(newUser);
-            System.out.println("Created new user: " + username);
+            return 0;
         }
     }
 }

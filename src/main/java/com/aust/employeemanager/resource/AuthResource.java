@@ -25,23 +25,15 @@ public class AuthResource {
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         String username = body.get("username");
         String password = body.get("password");
-        String role = body.get("role"); // new: send role from frontend
+        String userRole = "";
 
         try {
-            // Authenticate username/password first
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
 
-            // Verify that the user's role matches what was sent
-            String userRole = auth.getAuthorities().iterator().next().getAuthority();
-            if (!userRole.equals(role)) {
-                return ResponseEntity.status(403).body("Role does not match credentials");
-            }
-
-            // Generate JWT token with username and role
+            userRole = auth.getAuthorities().iterator().next().getAuthority();
             String token = jwtUtil.generateToken(username, userRole);
-
             return ResponseEntity.ok(Map.of("token", token));
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Invalid credentials");

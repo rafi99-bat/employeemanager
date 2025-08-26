@@ -1,7 +1,7 @@
 package com.aust.employeemanager.service;
 
 import com.aust.employeemanager.exception.UserNotFoundException;
-import com.aust.employeemanager.model.Employee;
+import com.aust.employeemanager.entity.Employee;
 import com.aust.employeemanager.repo.EmployeeRepo;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

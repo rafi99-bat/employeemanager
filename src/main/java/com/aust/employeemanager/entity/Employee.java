@@ -1,4 +1,4 @@
-package com.aust.employeemanager.model;
+package com.aust.employeemanager.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
@@ -82,17 +82,5 @@ public class Employee implements Serializable {
 
     public void setEmployeeCode(String employeeCode) {
         this.employeeCode = employeeCode;
-    }
-
-    @Override
-    public String toString() {
-        return "Employee{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", email='" + email + '\'' +
-                ", jobTitle='" + jobTitle + '\'' +
-                ", phone='" + phone + '\'' +
-                ", imageUrl='" + imageUrl + '\'' +
-                '}';
     }
 }

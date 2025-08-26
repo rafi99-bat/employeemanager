@@ -1,6 +1,6 @@
 package com.aust.employeemanager.resource;
 
-import com.aust.employeemanager.model.Employee;
+import com.aust.employeemanager.entity.Employee;
 import com.aust.employeemanager.service.EmployeeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

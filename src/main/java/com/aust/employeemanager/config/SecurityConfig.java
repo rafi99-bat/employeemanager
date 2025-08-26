@@ -40,30 +40,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-//    // Define in-memory users
-//    @Bean
-//    public UserDetailsService userDetailsService(PasswordEncoder passwordEncoder) {
-//        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
-//
-//        // A normal user (can only view)
-//        manager.createUser(
-//                User.withUsername("user")
-//                        .password(passwordEncoder.encode("user123"))
-//                        .roles("USER")
-//                        .build()
-//        );
-//
-//        // An admin user (can CRUD employees)
-//        manager.createUser(
-//                User.withUsername("admin")
-//                        .password(passwordEncoder.encode("admin123"))
-//                        .roles("ADMIN")
-//                        .build()
-//        );
-//
-//        return manager;
-//    }
-
     // Authentication provider using DB
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -79,32 +55,6 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    /*
-    // Define authorization rules
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())  // enable CORS
-                .authorizeHttpRequests(auth -> auth
-                        // allow preflight requests for all origins
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Registration should be allowed without login
-                        .requestMatchers("/users/create").permitAll()
-
-                        // USER and ADMIN can view
-                        .requestMatchers("/employee/all", "/employee/find/**").hasAnyRole("USER", "ADMIN")
-
-                        // Only ADMIN can add, update, delete
-                        .requestMatchers("/employee/add", "/employee/update", "/employee/delete/**").hasRole("ADMIN")
-
-                        // everything else requires authentication
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults()).build();
-    }*/
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthFilter jwtAuthFilter) throws Exception {
         return http
@@ -112,8 +62,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/users/create", "/auth/login").permitAll()
-                        .requestMatchers("/employee/all", "/employee/find/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers("/employee/add", "/employee/update", "/employee/delete/**").hasRole("ADMIN")
+                        .requestMatchers("/employee/all", "/employee/find/**").hasAnyRole("USER", "ADMIN") // everyone can find employees
+                        .requestMatchers("/employee/add", "/employee/update", "/employee/delete/**").hasRole("ADMIN") // only admin can add, edit and delete employees
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)

@@ -1,6 +1,6 @@
 package com.aust.employeemanager.service;
 
-import com.aust.employeemanager.model.AppUser;
+import com.aust.employeemanager.entity.AppUser;
 import com.aust.employeemanager.repo.UserRepo;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

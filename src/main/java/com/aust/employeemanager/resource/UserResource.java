@@ -16,11 +16,18 @@ public class UserResource {
     @PostMapping("/create")
     public ResponseEntity<String> registerUser(
             @RequestParam String username,
-            @RequestParam String password,
-            @RequestParam String role) {
+            @RequestParam String password) {
+        ResponseEntity<String> response = null;
         try {
-            userService.createUser(username, password, role);
-            return ResponseEntity.ok("User registered successfully!");
+            int flag = userService.createUser(username, password);
+            if (flag == 0){
+                response = ResponseEntity.ok("User registered successfully!");
+            } else if (flag == 1){
+                response = ResponseEntity.status(403).body("Username cannot be admin!");
+            } else if (flag == 2) {
+                response = ResponseEntity.status(401).body("Username already exists!");
+            }
+            return response;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error: " + e.getMessage());
