@@ -14,6 +14,9 @@ public class Employee implements Serializable {
     private String jobTitle;
     private String phone;
     private String imageUrl;
+    @ManyToOne
+    @JoinColumn(name = "religion_id")
+    private Religion religion;
     @Column(nullable = false, updatable = false)
     private String employeeCode;
 
@@ -75,6 +78,10 @@ public class Employee implements Serializable {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    public Religion getReligion() { return religion; }
+
+    public void setReligion(Religion religion) { this.religion = religion; }
 
     public String getEmployeeCode() {
         return employeeCode;

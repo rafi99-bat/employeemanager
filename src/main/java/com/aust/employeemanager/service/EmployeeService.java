@@ -1,5 +1,6 @@
 package com.aust.employeemanager.service;
 
+import com.aust.employeemanager.entity.Religion;
 import com.aust.employeemanager.exception.UserNotFoundException;
 import com.aust.employeemanager.entity.Employee;
 import com.aust.employeemanager.repo.EmployeeRepo;
@@ -13,6 +14,8 @@ import java.util.UUID;
 @Transactional
 public class EmployeeService {
     private final EmployeeRepo employeeRepo;
+    @Autowired
+    private ReligionService religionService;
 
     @Autowired
     public EmployeeService(EmployeeRepo employeeRepo) {
@@ -21,6 +24,10 @@ public class EmployeeService {
 
     public Employee addEmployee(Employee employee) {
         employee.setEmployeeCode(UUID.randomUUID().toString());
+        if (employee.getReligion() != null && employee.getReligion().getName() != null) {
+            Religion religion = religionService.addReligion(employee.getReligion().getName());
+            employee.setReligion(religion);
+        }
         return employeeRepo.save(employee);
     }
 
@@ -37,6 +44,7 @@ public class EmployeeService {
         existingEmployee.setEmail(employee.getEmail());
         existingEmployee.setJobTitle(employee.getJobTitle());
         existingEmployee.setPhone(employee.getPhone());
+        existingEmployee.setReligion(employee.getReligion());
         existingEmployee.setImageUrl(employee.getImageUrl());
         existingEmployee.setEmployeeCode(existingEmployee.getEmployeeCode());
 
