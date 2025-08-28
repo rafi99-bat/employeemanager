@@ -61,9 +61,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/users/create", "/auth/login", "/religion/**").permitAll()
+                        .requestMatchers("/users/create", "/auth/login").permitAll()
                         .requestMatchers("/employee/all", "/employee/find/**").hasAnyRole("USER", "ADMIN") // everyone can find employees
-                        .requestMatchers("/employee/add", "/employee/update", "/employee/delete/**").hasRole("ADMIN") // only admin can add, edit and delete employees
+                        .requestMatchers("/religion/**", "/employee/add", "/employee/update", "/employee/delete/**").hasRole("ADMIN") // only admin can add, edit and delete employees
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
