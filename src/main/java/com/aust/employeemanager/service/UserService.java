@@ -11,6 +11,8 @@ public class UserService {
     private final UserRepo userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final String defaultRole = "ROLE_USER";
+
     public UserService(UserRepo userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -25,11 +27,10 @@ public class UserService {
         if (existingUser != null) {
             return 2;
         } else {
-            // Create new user
             AppUser newUser = new AppUser();
             newUser.setUsername(username);
             newUser.setPassword(passwordEncoder.encode(rawPassword));
-            newUser.setRole("ROLE_USER");
+            newUser.setRole(defaultRole);
             userRepository.save(newUser);
             return 0;
         }
