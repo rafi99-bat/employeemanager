@@ -25,14 +25,13 @@ public class AuthResource {
     public ResponseEntity<?> login(@RequestBody Map<String, String> body) {
         String username = body.get("username");
         String password = body.get("password");
-        String userRole = "";
 
         try {
             Authentication auth = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
 
-            userRole = auth.getAuthorities().iterator().next().getAuthority();
+            String userRole = auth.getAuthorities().iterator().next().getAuthority();
             String token = jwtUtil.generateToken(username, userRole);
             return ResponseEntity.ok(Map.of("token", token));
         } catch (AuthenticationException e) {

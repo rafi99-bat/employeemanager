@@ -22,12 +22,13 @@ public class Employee implements Serializable {
 
     public Employee() {}
 
-    public Employee(String name, String email, String jobTitle, String phone, String imageUrl, String employeeCode) {
+    public Employee(String name, String email, String jobTitle, String phone, String imageUrl, Religion religion, String employeeCode) {
         this.name = name;
         this.email = email;
         this.jobTitle = jobTitle;
         this.phone = phone;
         this.imageUrl = imageUrl;
+        this.religion = religion;
         this.employeeCode = employeeCode;
     }
 
