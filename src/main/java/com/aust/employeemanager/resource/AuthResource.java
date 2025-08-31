@@ -1,10 +1,7 @@
 package com.aust.employeemanager.resource;
 
-import com.aust.employeemanager.security.JwtUtil;
+import com.aust.employeemanager.service.AuthService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,12 +10,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 public class AuthResource {
-    private final AuthenticationManager authManager;
-    private final JwtUtil jwtUtil;
+    private final AuthService authService;
 
-    public AuthResource(AuthenticationManager authManager, JwtUtil jwtUtil) {
-        this.authManager = authManager;
-        this.jwtUtil = jwtUtil;
+    public AuthResource(AuthService authService) {
+        this.authService = authService;
     }
 
     @PostMapping("/login")
@@ -27,15 +22,11 @@ public class AuthResource {
         String password = body.get("password");
 
         try {
-            Authentication auth = authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
-
-            String userRole = auth.getAuthorities().iterator().next().getAuthority();
-            String token = jwtUtil.generateToken(username, userRole);
-            return ResponseEntity.ok(Map.of("token", token));
+            Map<String, String> response = authService.authenticateUser(username, password);
+            return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
     }
 }
+
