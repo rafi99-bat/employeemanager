@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Objects;
 
 @Service
 public class EmployeeImageService {
@@ -61,7 +62,7 @@ public class EmployeeImageService {
 
         // save new file
         String fileName = "emp_" + employeeId + "_" + System.currentTimeMillis() + "_" +
-                StringUtils.cleanPath(file.getOriginalFilename());
+                StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         Path path = Paths.get(uploadDir).toAbsolutePath().normalize();
         Files.createDirectories(path);
         Path target = path.resolve(fileName);

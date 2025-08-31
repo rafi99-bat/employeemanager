@@ -48,10 +48,8 @@ public class EmployeeImageResource {
             return ResponseEntity.ok()
                     .header("Content-Type", "image/jpeg")
                     .body(imageBytes);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | IOException e) {
             return ResponseEntity.notFound().build();
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }
